@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Vidcrew — AI Tools</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#0a0a0a;color:#F5F5F0;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;justify-content:center;}
+#wrap{width:100%;max-width:430px;padding:0 0 80px;}
+.topbar{padding:50px 20px 14px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-ic{width:36px;height:36px;background:#E63B2E;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-tx{font-size:18px;font-weight:800;}
+.badge{background:rgba(201,168,76,0.15);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.tabs{display:flex;gap:0;border-bottom:1px solid #1a1a1a;padding:0 20px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:12px 16px;font-size:13px;font-weight:700;color:#555;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab.on{color:#F5F5F0;border-bottom-color:#E63B2E;}
+.screen{padding:16px 20px;display:none;}
+.screen.on{display:block;}
+.card{background:#111;border:1px solid #222;border-radius:18px;padding:18px;margin-bottom:14px;}
+.sl{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;margin-bottom:10px;}
+.btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:system-ui;transition:transform 0.1s;margin-bottom:8px;}
+.btn:active{transform:scale(0.97);}
+.btn-red{background:#E63B2E;color:white;}
+.btn-red:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-green{background:#2ECC71;color:white;}
+.btn-ghost{background:transparent;color:#F5F5F0;border:1.5px solid #333;}
+.btn-gold{background:linear-gradient(135deg,#C9A84C,#a8852e);color:white;}
+.upload-zone{border:2px dashed #333;border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.upload-zone.has-file{border-color:rgba(46,204,113,0.4);background:rgba(46,204,113,0.04);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.pbar{height:6px;background:#222;border-radius:100px;overflow:hidden;margin:10px 0;}
+.pfill{height:100%;border-radius:100px;transition:width 0.4s;}
+.pill{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;display:inline-block;}
+.pg{background:rgba(46,204,113,0.15);color:#2ECC71;border:1px solid rgba(46,204,113,0.3);}
+.pr{background:rgba(230,59,46,0.15);color:#E63B2E;border:1px solid rgba(230,59,46,0.3);}
+.po{background:rgba(243,156,18,0.15);color:#F39C12;border:1px solid rgba(243,156,18,0.3);}
+.pgo{background:rgba(201,168,76,0.15);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);}
+.inp{width:100%;background:#181818;border:1.5px solid #222;border-radius:12px;padding:12px 14px;color:#F5F5F0;font-family:system-ui;font-size:14px;outline:none;display:block;margin-bottom:10px;}
+.inp:focus{border-color:#E63B2E;}
+select.inp{cursor:pointer;}
+textarea.inp{resize:none;}
+.seg{background:#181818;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;border:1px solid #222;}
+.seg-ts{font-size:11px;font-weight:800;color:#E63B2E;background:rgba(230,59,46,0.1);padding:3px 8px;border-radius:6px;flex-shrink:0;margin-top:2px;}
+.seg-txt{font-size:13px;line-height:1.5;color:#F5F5F0;}
+.brief-field{margin-bottom:14px;}
+.brief-label{font-size:12px;color:#666;font-weight:600;margin-bottom:6px;}
+.brief-value{font-size:14px;font-weight:500;color:#F5F5F0;background:#181818;border-radius:10px;padding:10px 14px;line-height:1.5;}
+.silence-seg{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#181818;border-radius:12px;margin-bottom:6px;border:1px solid #222;}
+.infobox{border-radius:12px;padding:12px;font-size:12px;line-height:1.6;margin-bottom:14px;}
+.infobox-green{background:rgba(46,204,113,0.07);border:1px solid rgba(46,204,113,0.2);color:#2ECC71;}
+.infobox-gold{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;}
+.infobox-red{background:rgba(230,59,46,0.07);border:1px solid rgba(230,59,46,0.2);color:#E63B2E;}
+.caption-box{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;padding:14px;min-height:100px;font-size:14px;line-height:1.8;color:#F5F5F0;margin-bottom:12px;max-height:280px;overflow-y:auto;}
+.caption-line{padding:4px 0;border-bottom:1px solid #1a1a1a;}
+.caption-line:last-child{border:none;}
+.caption-ts{font-size:11px;color:#E63B2E;font-weight:700;margin-right:8px;}
+.caption-word{display:inline;}
+.live-caption{background:rgba(230,59,46,0.1);border-radius:8px;padding:8px 12px;font-size:14px;color:#F5F5F0;min-height:48px;margin-bottom:10px;border:1px solid rgba(230,59,46,0.2);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.pu{animation:pulse 1.5s infinite;}
+video{width:100%;border-radius:12px;background:#000;display:block;margin-top:8px;}
+.hidden{display:none!important;}
+.divider{height:1px;background:#1a1a1a;margin:14px 0;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="topbar">
+    <div class="logo"><div class="logo-ic">🤖</div><div class="logo-tx">Vidcrew AI</div></div>
+    <span class="badge">FREE TOOLS</span>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab on" data-t="captions">🎤 Auto Captions</div>
+    <div class="tab" data-t="silence">✂️ Silence Detector</div>
+    <div class="tab" data-t="brief">📋 AI Brief</div>
+  </div>
+
+  <!-- ── TAB 1: AUTO CAPTIONS ─────────────────────────────────────── -->
+  <div class="screen on" id="t-captions">
+    <div class="infobox infobox-green">✅ Uses Chrome's built-in speech recognition · 100% free · No API key needed · Works offline after page loads</div>
+
+    <div class="card" id="cap-upload-card">
+      <div class="sl">1. Load your video</div>
+      <div class="upload-zone" id="cap-zone">
+        <input type="file" id="cap-file" accept="video/*,audio/*"/>
+        <div style="font-size:32px;margin-bottom:8px;">🎥</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:3px;">Tap to select video</div>
+        <div style="font-size:12px;color:#666;">MP4, MOV, AVI, MP3, WAV</div>
+      </div>
+      <video id="cap-video" class="hidden" controls playsinline></video>
+    </div>
+
+    <div class="card">
+      <div class="sl">2. Language</div>
+      <select class="inp" id="cap-lang">
+        <option value="en-IN">English (India)</option>
+        <option value="hi-IN">Hindi</option>
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+      </select>
+    </div>
+
+    <button class="btn btn-red" id="cap-start" disabled>🎤 Start Auto Captions</button>
+    <button class="btn btn-ghost hidden" id="cap-stop">⏹ Stop Captions</button>
+
+    <div id="cap-live-wrap" class="hidden">
+      <div class="sl">Live transcription</div>
+      <div class="live-caption" id="cap-live">Listening...</div>
+    </div>
+
+    <div id="cap-results" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div class="sl" style="margin:0;">Generated Captions</div>
+        <span class="pill pg" id="cap-count">0 lines</span>
+      </div>
+      <div class="caption-box" id="cap-box"></div>
+      <button class="btn btn-gold" id="cap-copy">📋 Copy All Captions</button>
+      <button class="btn btn-ghost" id="cap-srt">⬇️ Download as SRT File</button>
+      <button class="btn btn-ghost" id="cap-clear">🗑 Clear & Start Again</button>
+    </div>
+  </div>
+
+  <!-- ── TAB 2: SILENCE DETECTOR ─────────────────────────────────── -->
+  <div class="screen" id="t-silence">
+    <div class="infobox infobox-gold">⚡ Analyses audio waveform · Finds all silent gaps instantly · Shows exact timestamps for cuts · 100% free · No upload needed</div>
+
+    <div class="card">
+      <div class="sl">1. Load your video/audio</div>
+      <div class="upload-zone" id="sil-zone">
+        <input type="file" id="sil-file" accept="video/*,audio/*"/>
+        <div style="font-size:32px;margin-bottom:8px;">🎬</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:3px;">Tap to select file</div>
+        <div style="font-size:12px;color:#666;">Video or audio file</div>
+      </div>
+      <div id="sil-info" class="hidden" style="margin-top:12px;background:#181818;border-radius:12px;padding:12px;">
+        <div id="sil-fname" style="font-weight:600;font-size:14px;"></div>
+        <div id="sil-fsize" style="font-size:12px;color:#666;margin-top:2px;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sl">2. Settings</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+        <div style="flex:1;"><div style="font-size:13px;margin-bottom:5px;">Silence threshold (dB)</div>
+        <input type="range" id="sil-thresh" min="-60" max="-20" value="-40" style="width:100%;accent-color:#E63B2E;"/></div>
+        <div style="font-size:13px;font-weight:700;color:#E63B2E;width:40px;text-align:right;" id="sil-thresh-val">-40</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div style="flex:1;"><div style="font-size:13px;margin-bottom:5px;">Min silence duration (sec)</div>
+        <input type="range" id="sil-min" min="0.3" max="3" step="0.1" value="0.5" style="width:100%;accent-color:#E63B2E;"/></div>
+        <div style="font-size:13px;font-weight:700;color:#E63B2E;width:40px;text-align:right;" id="sil-min-val">0.5s</div>
+      </div>
+    </div>
+
+    <button class="btn btn-red" id="sil-go" disabled>✂️ Detect Silences</button>
+
+    <div id="sil-processing" class="hidden">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:600;" id="sil-plbl">Analysing audio...</span>
+          <span style="color:#C9A84C;font-weight:800;" id="sil-ppct">0%</span>
+        </div>
+        <div class="pbar"><div class="pfill" id="sil-pbar" style="width:0%;background:linear-gradient(90deg,#E63B2E,#C9A84C);"></div></div>
+      </div>
+    </div>
+
+    <div id="sil-results" class="hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+        <div class="card" style="padding:12px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#E63B2E;" id="sil-r-count">0</div>
+          <div style="font-size:11px;color:#666;margin-top:2px;">Silences</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#C9A84C;" id="sil-r-time">0s</div>
+          <div style="font-size:11px;color:#666;margin-top:2px;">Total Saved</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2ECC71;" id="sil-r-pct">0%</div>
+          <div style="font-size:11px;color:#666;margin-top:2px;">Of Video</div>
+        </div>
+      </div>
+
+      <div class="sl">Silent Segments — Cut These</div>
+      <div id="sil-list"></div>
+      <button class="btn btn-gold" id="sil-copy">📋 Copy Cut List</button>
+      <button class="btn btn-ghost" id="sil-again">Analyse Another File</button>
+    </div>
+  </div>
+
+  <!-- ── TAB 3: AI BRIEF ─────────────────────────────────────────── -->
+  <div class="screen" id="t-brief">
+    <div class="infobox infobox-red" id="brief-need-key" style="display:none;">⚠️ Enter your Claude API key below to use AI Brief generation. Get one free at console.anthropic.com</div>
+    <div class="infobox infobox-green">🤖 Claude AI generates a professional editing brief instantly · Based on client inputs · Editor gets everything they need</div>
+
+    <div class="card">
+      <div class="sl">Client Details</div>
+      <input class="inp" id="b-client" placeholder="Client name"/>
+      <input class="inp" id="b-project" placeholder="Project title (e.g. Product Launch Video)"/>
+      <select class="inp" id="b-type">
+        <option value="">Select video type...</option>
+        <option>YouTube Tutorial</option>
+        <option>Instagram Reels</option>
+        <option>YouTube Shorts</option>
+        <option>Documentary</option>
+        <option>Podcast Edit</option>
+        <option>Meta Ad</option>
+        <option>Corporate Video</option>
+        <option>Wedding Film</option>
+      </select>
+      <select class="inp" id="b-duration">
+        <option value="">Video length...</option>
+        <option>Under 1 minute</option>
+        <option>1–3 minutes</option>
+        <option>3–5 minutes</option>
+        <option>5–10 minutes</option>
+        <option>10–20 minutes</option>
+        <option>20–60 minutes</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="sl">Style Preferences</div>
+      <select class="inp" id="b-mood">
+        <option value="">Overall mood...</option>
+        <option>Energetic & Hype</option>
+        <option>Cinematic & Epic</option>
+        <option>Professional & Corporate</option>
+        <option>Fun & Playful</option>
+        <option>Emotional & Storytelling</option>
+        <option>Minimal & Clean</option>
+        <option>Dark & Moody</option>
+        <option>Warm & Natural</option>
+      </select>
+      <select class="inp" id="b-pace">
+        <option value="">Editing pace...</option>
+        <option>Very fast (like TikTok/Reels)</option>
+        <option>Fast paced</option>
+        <option>Medium paced</option>
+        <option>Slow and cinematic</option>
+      </select>
+      <select class="inp" id="b-music">
+        <option value="">Music preference...</option>
+        <option>Upbeat & energetic</option>
+        <option>Cinematic orchestra</option>
+        <option>Chill lo-fi</option>
+        <option>Corporate background</option>
+        <option>No music</option>
+        <option>Client will provide</option>
+      </select>
+      <input class="inp" id="b-ref" placeholder="Reference video (YouTube link or description)"/>
+    </div>
+
+    <div class="card">
+      <div class="sl">Delivery</div>
+      <select class="inp" id="b-plan">
+        <option value="">Select plan...</option>
+        <option>⚡ 4-Hour Rush — ₹1,499</option>
+        <option>Premium — Under 1 min — ₹799</option>
+        <option>Premium — 1–5 min — ₹1,499</option>
+        <option>Premium — 5–15 min — ₹2,499</option>
+        <option>Premium — 15–30 min — ₹3,999</option>
+        <option>Premium — 30–60 min — ₹5,999</option>
+      </select>
+      <textarea class="inp" id="b-notes" rows="3" placeholder="Special instructions from client..."></textarea>
+    </div>
+
+    <div class="card" id="api-card">
+      <div class="sl">Claude API Key</div>
+      <input class="inp" id="b-apikey" type="password" placeholder="sk-ant-... (get free at console.anthropic.com)"/>
+      <div style="font-size:11px;color:#666;">Key is never stored or sent anywhere except to Anthropic directly</div>
+    </div>
+
+    <button class="btn btn-red" id="brief-go">🤖 Generate AI Brief</button>
+
+    <div id="brief-loading" class="hidden">
+      <div class="card" style="text-align:center;padding:28px;">
+        <div style="font-size:36px;margin-bottom:10px;" class="pu">🤖</div>
+        <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Claude is writing the brief...</div>
+        <div style="font-size:12px;color:#666;">Usually takes 5–10 seconds</div>
+      </div>
+    </div>
+
+    <div id="brief-result" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-weight:800;font-size:18px;">✨ Brief Generated</div>
+        <span class="pill pg">AI POWERED</span>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,#0d0d0d,#111);border-color:rgba(201,168,76,0.25);">
+        <div id="brief-content" style="font-size:13px;line-height:1.9;color:#F5F5F0;white-space:pre-wrap;"></div>
+      </div>
+      <button class="btn btn-gold" id="brief-copy">📋 Copy Brief</button>
+      <button class="btn btn-ghost" id="brief-wa">📲 Send to Editor on WhatsApp</button>
+      <button class="btn btn-ghost" id="brief-new">Generate Another Brief</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── TABS ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+    document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('on');});
+    t.classList.add('on');
+    document.getElementById('t-'+t.dataset.t).classList.add('on');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 1 — AUTO CAPTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+var capLines = [];
+var recognition = null;
+var capActive = false;
+var capVideo = null;
+var lineTimer = null;
+var currentLine = '';
+var lineStart = 0;
+
+document.getElementById('cap-file').addEventListener('change', function(e){
+  var f = e.target.files[0]; if(!f) return;
+  var url = URL.createObjectURL(f);
+  var vid = document.getElementById('cap-video');
+  vid.src = url;
+  vid.classList.remove('hidden');
+  document.getElementById('cap-zone').classList.add('has-file');
+  document.getElementById('cap-start').disabled = false;
+  capVideo = vid;
+});
+
+document.getElementById('cap-start').addEventListener('click', function(){
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    alert('Speech recognition not supported in this browser. Please use Chrome.');
+    return;
+  }
+  startCaptions();
+});
+
+function startCaptions(){
+  capLines = [];
+  capActive = true;
+  document.getElementById('cap-start').classList.add('hidden');
+  document.getElementById('cap-stop').classList.remove('hidden');
+  document.getElementById('cap-live-wrap').classList.remove('hidden');
+  document.getElementById('cap-results').classList.add('hidden');
+  document.getElementById('cap-box').innerHTML = '';
+
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = document.getElementById('cap-lang').value;
+  recognition.maxAlternatives = 1;
+
+  var startTime = Date.now();
+  if(capVideo){ capVideo.play(); startTime = Date.now(); }
+
+  recognition.onresult = function(e){
+    var interim = '';
+    for(var i = e.resultIndex; i < e.results.length; i++){
+      var transcript = e.results[i][0].transcript;
+      if(e.results[i].isFinal){
+        var ts = ((Date.now() - startTime) / 1000).toFixed(1);
+        capLines.push({ts: ts, text: transcript.trim()});
+        addCaptionLine(ts, transcript.trim());
+        document.getElementById('cap-count').textContent = capLines.length + ' lines';
+      } else {
+        interim += transcript;
+      }
+    }
+    document.getElementById('cap-live').textContent = interim || 'Listening...';
+  };
+
+  recognition.onerror = function(e){
+    if(e.error === 'no-speech') return;
+    document.getElementById('cap-live').textContent = 'Error: ' + e.error + '. Try again.';
+  };
+
+  recognition.onend = function(){
+    if(capActive){
+      try{ recognition.start(); } catch(e){}
+    }
+  };
+
+  recognition.start();
+}
+
+function addCaptionLine(ts, text){
+  var box = document.getElementById('cap-box');
+  var line = document.createElement('div');
+  line.className = 'caption-line';
+  line.innerHTML = '<span class="caption-ts">' + formatTS(parseFloat(ts)) + '</span><span class="caption-word">' + text + '</span>';
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('cap-results').classList.remove('hidden');
+}
+
+function formatTS(secs){
+  var m = Math.floor(secs/60), s = Math.floor(secs%60);
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+document.getElementById('cap-stop').addEventListener('click', function(){
+  capActive = false;
+  if(recognition) recognition.stop();
+  if(capVideo) capVideo.pause();
+  document.getElementById('cap-stop').classList.add('hidden');
+  document.getElementById('cap-start').classList.remove('hidden');
+  document.getElementById('cap-live-wrap').classList.add('hidden');
+  document.getElementById('cap-live').textContent = 'Listening...';
+});
+
+document.getElementById('cap-copy').addEventListener('click', function(){
+  var text = capLines.map(function(l){ return '['+formatTS(l.ts)+'] '+l.text; }).join('\n');
+  if(navigator.clipboard){ navigator.clipboard.writeText(text); }
+  else{ var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta); }
+  document.getElementById('cap-copy').textContent = '✅ Copied!';
+  setTimeout(function(){ document.getElementById('cap-copy').textContent = '📋 Copy All Captions'; }, 2000);
+});
+
+document.getElementById('cap-srt').addEventListener('click', function(){
+  var srt = capLines.map(function(l, i){
+    var s = parseFloat(l.ts);
+    var e = parseFloat(capLines[i+1] ? capLines[i+1].ts : s+3);
+    function fmt(t){ var h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=Math.floor(t%60),ms=Math.round((t%1)*1000); return (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s+','+(ms<100?'0':'')+ms; }
+    return (i+1)+'\n'+fmt(s)+' --> '+fmt(e)+'\n'+l.text+'\n';
+  }).join('\n');
+  var blob = new Blob([srt], {type:'text/plain'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'vidcrew_captions.srt'; a.click();
+});
+
+document.getElementById('cap-clear').addEventListener('click', function(){
+  capLines = [];
+  document.getElementById('cap-box').innerHTML = '';
+  document.getElementById('cap-count').textContent = '0 lines';
+  document.getElementById('cap-results').classList.add('hidden');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 2 — SILENCE DETECTOR
+// ═══════════════════════════════════════════════════════════════════════════
+var silFile = null;
+
+document.getElementById('sil-thresh').addEventListener('input', function(){
+  document.getElementById('sil-thresh-val').textContent = this.value;
+});
+document.getElementById('sil-min').addEventListener('input', function(){
+  document.getElementById('sil-min-val').textContent = this.value + 's';
+});
+
+document.getElementById('sil-file').addEventListener('change', function(e){
+  var f = e.target.files[0]; if(!f) return;
+  silFile = f;
+  document.getElementById('sil-info').classList.remove('hidden');
+  document.getElementById('sil-fname').textContent = f.name.length > 30 ? f.name.slice(0,27)+'...' : f.name;
+  document.getElementById('sil-fsize').textContent = (f.size/1024/1024).toFixed(1) + ' MB';
+  document.getElementById('sil-zone').classList.add('has-file');
+  document.getElementById('sil-go').disabled = false;
+});
+
+document.getElementById('sil-go').addEventListener('click', function(){
+  if(!silFile) return;
+  document.getElementById('sil-processing').classList.remove('hidden');
+  document.getElementById('sil-results').classList.add('hidden');
+  setTimeout(detectSilence, 100);
+});
+
+function setSilP(pct, lbl){
+  document.getElementById('sil-pbar').style.width = pct + '%';
+  document.getElementById('sil-ppct').textContent = pct + '%';
+  document.getElementById('sil-plbl').textContent = lbl;
+}
+
+async function detectSilence(){
+  try{
+    setSilP(5, 'Reading audio file...');
+    var thresh = parseFloat(document.getElementById('sil-thresh').value);
+    var minDur = parseFloat(document.getElementById('sil-min').value);
+    var threshLinear = Math.pow(10, thresh / 20);
+
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var arrayBuf = await silFile.arrayBuffer();
+    setSilP(25, 'Decoding audio...');
+    var audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+    setSilP(45, 'Analysing waveform...');
+
+    var channelData = audioBuf.getChannelData(0);
+    var sampleRate = audioBuf.sampleRate;
+    var duration = audioBuf.duration;
+    var chunkSize = Math.floor(sampleRate * 0.05); // 50ms chunks
+
+    var silences = [];
+    var inSilence = false;
+    var silStart = 0;
+
+    for(var i = 0; i < channelData.length; i += chunkSize){
+      var chunk = channelData.slice(i, i + chunkSize);
+      var rms = 0;
+      for(var j = 0; j < chunk.length; j++) rms += chunk[j] * chunk[j];
+      rms = Math.sqrt(rms / chunk.length);
+
+      var timeSec = i / sampleRate;
+      var pct = Math.round(45 + (i / channelData.length) * 45);
+      if(i % (chunkSize * 20) === 0) setSilP(pct, 'Scanning ' + timeSec.toFixed(1) + 's of ' + duration.toFixed(1) + 's...');
+
+      if(rms < threshLinear){
+        if(!inSilence){ inSilence = true; silStart = timeSec; }
+      } else {
+        if(inSilence){
+          inSilence = false;
+          var silDur = timeSec - silStart;
+          if(silDur >= minDur){
+            silences.push({start: silStart, end: timeSec, dur: silDur});
+          }
+        }
+      }
+    }
+
+    if(inSilence){
+      var silDur2 = duration - silStart;
+      if(silDur2 >= minDur) silences.push({start: silStart, end: duration, dur: silDur2});
+    }
+
+    audioCtx.close();
+    setSilP(100, 'Done!');
+    setTimeout(function(){ showSilenceResults(silences, duration); }, 300);
+
+  } catch(err){
+    setSilP(0, 'Error: ' + err.message);
+    document.getElementById('sil-plbl').style.color = '#E63B2E';
+  }
+}
+
+function showSilenceResults(silences, duration){
+  document.getElementById('sil-processing').classList.add('hidden');
+  document.getElementById('sil-results').classList.remove('hidden');
+
+  var totalSaved = silences.reduce(function(a,s){ return a + s.dur; }, 0);
+  var pct = Math.round((totalSaved / duration) * 100);
+
+  document.getElementById('sil-r-count').textContent = silences.length;
+  document.getElementById('sil-r-time').textContent = totalSaved.toFixed(1) + 's';
+  document.getElementById('sil-r-pct').textContent = pct + '%';
+
+  var list = document.getElementById('sil-list');
+  list.innerHTML = '';
+
+  if(silences.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:#666;font-size:14px;">No silences found. Try lowering the threshold.</div>';
+    return;
+  }
+
+  silences.forEach(function(s, i){
+    var row = document.createElement('div');
+    row.className = 'silence-seg';
+    var typeColor = s.dur > 2 ? '#E63B2E' : s.dur > 1 ? '#F39C12' : '#666';
+    var typeLabel = s.dur > 2 ? 'Long silence' : s.dur > 1 ? 'Silence' : 'Short gap';
+    row.innerHTML =
+      '<div style="width:32px;height:32px;background:rgba(230,59,46,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#E63B2E;flex-shrink:0;">'+(i+1)+'</div>'+
+      '<div style="flex:1;">'+
+        '<div style="font-size:13px;font-weight:700;">'+formatTS(s.start)+' → '+formatTS(s.end)+'</div>'+
+        '<div style="font-size:11px;color:'+typeColor+';margin-top:2px;">'+typeLabel+' · '+s.dur.toFixed(1)+'s</div>'+
+      '</div>'+
+      '<span class="pill" style="background:rgba(230,59,46,0.1);color:#E63B2E;border:1px solid rgba(230,59,46,0.2);font-size:10px;">CUT</span>';
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('sil-copy').addEventListener('click', function(){
+  var list = document.getElementById('sil-list');
+  var items = list.querySelectorAll('.silence-seg');
+  var text = 'SILENCE DETECTOR — VIDCREW\n\nCut these segments:\n\n';
+  items.forEach(function(item, i){
+    text += (i+1) + '. ' + item.querySelector('div:nth-child(2) div:first-child').textContent + '\n';
+  });
+  if(navigator.clipboard) navigator.clipboard.writeText(text);
+  document.getElementById('sil-copy').textContent = '✅ Copied!';
+  setTimeout(function(){ document.getElementById('sil-copy').textContent = '📋 Copy Cut List'; }, 2000);
+});
+
+document.getElementById('sil-again').addEventListener('click', function(){
+  silFile = null;
+  document.getElementById('sil-file').value = '';
+  document.getElementById('sil-info').classList.add('hidden');
+  document.getElementById('sil-results').classList.add('hidden');
+  document.getElementById('sil-go').disabled = true;
+  document.getElementById('sil-zone').classList.remove('has-file');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 3 — AI BRIEF GENERATOR
+// ═══════════════════════════════════════════════════════════════════════════
+var lastBrief = '';
+
+document.getElementById('brief-go').addEventListener('click', generateBrief);
+
+async function generateBrief(){
+  var client = document.getElementById('b-client').value.trim();
+  var project = document.getElementById('b-project').value.trim();
+  var type = document.getElementById('b-type').value;
+  var duration = document.getElementById('b-duration').value;
+  var mood = document.getElementById('b-mood').value;
+  var pace = document.getElementById('b-pace').value;
+  var music = document.getElementById('b-music').value;
+  var ref = document.getElementById('b-ref').value.trim();
+  var plan = document.getElementById('b-plan').value;
+  var notes = document.getElementById('b-notes').value.trim();
+  var apiKey = document.getElementById('b-apikey').value.trim();
+
+  if(!client || !project || !type){
+    alert('Please fill in client name, project title and video type at minimum.');
+    return;
+  }
+
+  document.getElementById('brief-loading').classList.remove('hidden');
+  document.getElementById('brief-result').classList.add('hidden');
+  document.getElementById('brief-go').disabled = true;
+
+  // If API key provided, use Claude API
+  if(apiKey && apiKey.startsWith('sk-ant-')){
+    try{
+      var prompt = 'Generate a professional video editing brief for a video editor. Be specific, clear and actionable. Format it nicely with sections.\n\nProject Details:\n- Client: '+client+'\n- Project: '+project+'\n- Type: '+type+'\n- Duration: '+(duration||'Not specified')+'\n- Mood: '+(mood||'Not specified')+'\n- Pace: '+(pace||'Not specified')+'\n- Music: '+(music||'Not specified')+'\n- Reference: '+(ref||'None provided')+'\n- Plan: '+(plan||'Not specified')+'\n- Special Notes: '+(notes||'None')+'\n\nWrite the brief as if you are the project manager handing this to an editor. Include: project overview, style direction, technical specs, key requirements, deadline reminder, and any special instructions.';
+
+      var res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+        body: JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:800,messages:[{role:'user',content:prompt}]})
+      });
+      var data = await res.json();
+      if(data.content && data.content[0]){
+        showBrief(data.content[0].text);
+      } else {
+        throw new Error(data.error ? data.error.message : 'API error');
+      }
+    } catch(err){
+      // Fall back to template
+      showBrief(generateTemplateBrief(client,project,type,duration,mood,pace,music,ref,plan,notes));
+    }
+  } else {
+    // Use smart template — no API key needed
+    await new Promise(function(r){ setTimeout(r, 1200); }); // simulate AI thinking
+    showBrief(generateTemplateBrief(client,project,type,duration,mood,pace,music,ref,plan,notes));
+  }
+}
+
+function generateTemplateBrief(client,project,type,duration,mood,pace,music,ref,plan,notes){
+  var now = new Date();
+  var deadline = plan && plan.includes('4-Hour') ? '4 HOURS from assignment' : 'As per agreed deadline';
+
+  var moodGuide = {
+    'Energetic & Hype': 'Jump cuts, dynamic transitions, high energy throughout. Keep clips short (2-4 sec max). Match every beat.',
+    'Cinematic & Epic': 'Slow reveals, smooth transitions, dramatic pacing. Let shots breathe. Use colour grading to add depth.',
+    'Professional & Corporate': 'Clean cuts, minimal transitions, consistent pacing. Professional tone throughout. No fancy effects.',
+    'Fun & Playful': 'Quick cuts, fun transitions, upbeat energy. Emojis/text overlays welcome. Keep it lighthearted.',
+    'Emotional & Storytelling': 'Story-first editing. Let emotional moments breathe. Music drives the pace. Subtle colour grading.',
+    'Minimal & Clean': 'Simple cuts only. White/black transitions if needed. No effects. Clean and sophisticated.',
+    'Dark & Moody': 'Slow pacing, dramatic music, dark colour grade. Use shadows. Contrast should be high.',
+    'Warm & Natural': 'Natural colour grade, warm tones, organic transitions. Feels authentic and genuine.',
+  };
+
+  var brief = '━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  brief += '     VIDCREW — EDITING BRIEF\n';
+  brief += '━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  brief += '📋 PROJECT OVERVIEW\n';
+  brief += 'Client: ' + client + '\n';
+  brief += 'Project: ' + project + '\n';
+  brief += 'Type: ' + type + '\n';
+  if(duration) brief += 'Target Length: ' + duration + '\n';
+  if(plan) brief += 'Plan: ' + plan + '\n';
+  brief += '\n';
+  brief += '⏱ DEADLINE\n';
+  brief += deadline + '\n\n';
+  brief += '🎨 STYLE DIRECTION\n';
+  if(mood){ brief += 'Mood: ' + mood + '\n'; if(moodGuide[mood]) brief += '→ ' + moodGuide[mood] + '\n'; }
+  if(pace) brief += 'Pace: ' + pace + '\n';
+  if(music) brief += 'Music: ' + music + '\n';
+  if(ref) brief += 'Reference: ' + ref + '\n';
+  brief += '\n';
+  brief += '✅ KEY REQUIREMENTS\n';
+  brief += '• Watch all footage before cutting\n';
+  brief += '• Match music beats to cuts\n';
+  brief += '• Colour grade to match the mood above\n';
+  brief += '• Normalise audio levels throughout\n';
+  if(type === 'Instagram Reels' || type === 'YouTube Shorts') brief += '• Export in 9:16 vertical format\n';
+  if(type === 'YouTube Tutorial') brief += '• Keep intro under 15 seconds\n';
+  if(type === 'Podcast Edit') brief += '• Remove all silences over 1 second\n';
+  brief += '\n';
+  if(notes){
+    brief += '📝 SPECIAL INSTRUCTIONS\n';
+    brief += notes + '\n\n';
+  }
+  brief += '━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  brief += 'Generated by Vidcrew AI · ' + now.toLocaleDateString();
+  return brief;
+}
+
+function showBrief(text){
+  lastBrief = text;
+  document.getElementById('brief-loading').classList.add('hidden');
+  document.getElementById('brief-result').classList.remove('hidden');
+  document.getElementById('brief-content').textContent = text;
+  document.getElementById('brief-go').disabled = false;
+}
+
+document.getElementById('brief-copy').addEventListener('click', function(){
+  if(navigator.clipboard) navigator.clipboard.writeText(lastBrief);
+  else{ var ta=document.createElement('textarea');ta.value=lastBrief;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta); }
+  document.getElementById('brief-copy').textContent = '✅ Copied!';
+  setTimeout(function(){ document.getElementById('brief-copy').textContent = '📋 Copy Brief'; }, 2000);
+});
+
+document.getElementById('brief-wa').addEventListener('click', function(){
+  var msg = 'Hi! Here is the project brief:\n\n' + lastBrief;
+  window.open('https://wa.me/919211025509?text=' + encodeURIComponent(msg), '_blank');
+});
+
+document.getElementById('brief-new').addEventListener('click', function(){
+  document.getElementById('brief-result').classList.add('hidden');
+  document.getElementById('b-client').value='';
+  document.getElementById('b-project').value='';
+  document.getElementById('b-type').value='';
+  document.getElementById('b-duration').value='';
+  document.getElementById('b-mood').value='';
+  document.getElementById('b-pace').value='';
+  document.getElementById('b-music').value='';
+  document.getElementById('b-ref').value='';
+  document.getElementById('b-plan').value='';
+  document.getElementById('b-notes').value='';
+});
+</script>
+</body>
+</html>
